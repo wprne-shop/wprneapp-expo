@@ -16,11 +16,11 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "bundleIdentifier": "com.syarif-studio.wprne",
+      "bundleIdentifier": "com.syarifstudio.wprne",
       "buildNumber": "1.0.0"
     },
     "android": {
-      "package": "com.syarif-studio.wprne",
+      "package": "com.syarifstudio.wprne",
       "versionCode": 1
     }
   }
