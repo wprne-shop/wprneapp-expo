@@ -1,7 +1,6 @@
 import React from "react"
 import { Button as ButtonUi } from "react-native-elements"
 import { useNavigation } from "@react-navigation/native"
-import { TouchableWithoutFeedback } from "react-native"
 import {
   useAction,
   useProduct,
@@ -85,11 +84,10 @@ export const Button = ({ onPressAction, navigateTo, ...props }) => {
   return (
     <ButtonUi
       onPress={handleOnPress}
-      buttonStyle={{ ...componentStyle, flex: 1 }}
+      buttonStyle={{ ...componentStyle }}
       containerStyle={containerStyle}
       icon={{ ...icon, type: icon.provider }}
       titleStyle={fontStyle}
-      TouchableComponent={TouchableWithoutFeedback}
       {...restProps}
     />
   )

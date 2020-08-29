@@ -7,7 +7,9 @@ import {
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { RecoilRoot } from "recoil"
+import { SplashScreen } from "expo"
 import { config } from "./config"
 import { Icon } from "react-native-elements"
 import * as components from "./src/Components"
@@ -43,8 +45,11 @@ const buildComponent = (parent, page) => {
 
 const Page = ({ json }) => {
   const data = JSON.parse(json)
-  console.log("json data", data)
-  return buildComponent("ROOT", data) || null
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      {buildComponent("ROOT", data) || null}
+    </SafeAreaView>
+  )
 }
 
 function getOptions(route, pages) {
@@ -62,7 +67,6 @@ const Tab = createBottomTabNavigator()
 function BottomBar({ pages, navigation, route }) {
   React.useLayoutEffect(() => {
     const options = getOptions(route, pages)
-    console.log("options", options)
     navigation.setOptions({ ...options })
   }, [navigation, route, pages])
 
@@ -108,54 +112,66 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetch(config.baseUrl + "wp-json/wprne/v1/pages/get_page")
+    SplashScreen.preventAutoHide()
+
+    fetch(config.baseUrl + "wp-admin/admin-ajax.php", {
+      method: "POST",
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "action=wprne_get_page"
+    })
       .then((res) => {
         return res.json()
       })
       .then((data) => {
-        setPages(data?.pages)
-        setIsLoading(false)
+        if (data?.pages) {
+          setPages(data?.pages)
+          setIsLoading(false)
+        }
+        SplashScreen.hide()
       })
   }, [])
 
-  if (isLoading) {
+  const firstBottomNav = pages?.find((page) => page?.addToBottomNav)
+
+  if (!pages) {
     return (
-      <View style={styles.container}>
-        <TextNative>Loading....</TextNative>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <TextNative>There is no page to display</TextNative>
       </View>
     )
   }
 
-  console.log("pages", pages)
-
-  const firstBottomNav = pages.find((page) => page?.addToBottomNav)
-
   return (
     <RecoilRoot>
-      <NavigationContainer>
-        <Stack.Navigator>
-          {firstBottomNav && (
-            <Stack.Screen name="BottomBar">
-              {(props) => <BottomBar {...props} pages={pages} />}
-            </Stack.Screen>
-          )}
-          {Array.isArray(pages) &&
-            pages.map((page, id) => (
-              <Stack.Screen
-                key={id}
-                name={`page-${id}`}
-                options={{
-                  title: page.name,
-                  headerShown: page.showHeaderBar
-                }}
-              >
-                {(props) => (
-                  <Page {...props} json={page.json} title={page.name} />
-                )}
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <Stack.Navigator>
+            {firstBottomNav && (
+              <Stack.Screen name="BottomBar">
+                {(props) => <BottomBar {...props} pages={pages} />}
               </Stack.Screen>
-            ))}
-        </Stack.Navigator>
-      </NavigationContainer>
+            )}
+            {Array.isArray(pages) &&
+              pages.map((page, id) => (
+                <Stack.Screen
+                  key={id}
+                  name={`page-${id}`}
+                  options={{
+                    title: page.name,
+                    headerShown: page.showHeaderBar
+                  }}
+                >
+                  {(props) => (
+                    <Page {...props} json={page.json} title={page.name} />
+                  )}
+                </Stack.Screen>
+              ))}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
     </RecoilRoot>
   )
 }

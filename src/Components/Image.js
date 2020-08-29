@@ -6,7 +6,7 @@ export const Image = ({ source, postContent, ...props }) => {
   const image = usePostImage(postContent)
 
   source = postContent !== "disable" ? image : source
-  // source = source?.replace('localhost', '192.168.43.56')
+  source = source?.replace("localhost", "192.168.43.56")
   const { style, children, ...restProps } = props
   const imgSrc = source
     ? { uri: source }
