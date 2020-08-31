@@ -24,16 +24,16 @@ const FlatListComp = ({ children, style, ...props }) => {
   return (
     postData &&
     Array.isArray(postData) && (
-      <FlatList
-        data={postData}
-        keyExtractor={(item) => item.id.toString()}
-        {...flatListProps}
-        renderItem={({ item, index }) => (
-          <IndexProvider value={index}>
-            <View style={style}>{children}</View>
-          </IndexProvider>
-        )}
-      />
+      <View style={{ height: "auto", ...style }}>
+        <FlatList
+          data={postData}
+          keyExtractor={(item) => item.id.toString()}
+          {...flatListProps}
+          renderItem={({ item, index }) => (
+            <IndexProvider value={index}>{children}</IndexProvider>
+          )}
+        />
+      </View>
     )
   )
 }
@@ -64,18 +64,18 @@ export const GridPost = ({ postType, ...props }) => {
 
   if (postType === "product") {
     return (
-      <ProductRoot query={props.query}>
+      <ProductRoot query={props.productQuery}>
         <ActionProvider value={globalAction}>
-          <FlatListComp {...props} />
+          <FlatListComp postType={postType} {...props} />
         </ActionProvider>
       </ProductRoot>
     )
   }
 
   return (
-    <PostRoot query={props.query} postType={postType}>
+    <PostRoot query={props.postQuery} postType={postType}>
       <ActionProvider value={globalAction}>
-        <FlatListComp {...props} />
+        <FlatListComp postType={postType} {...props} />
       </ActionProvider>
     </PostRoot>
   )

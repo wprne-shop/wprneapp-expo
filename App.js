@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { StyleSheet, View, Text as TextNative } from "react-native"
+import { StyleSheet, View, Text as TextNative, ScrollView } from "react-native"
 import { Container, Image, Text, GridPost, Button } from "./src/Components"
 import {
   NavigationContainer,
@@ -47,7 +47,7 @@ const Page = ({ json }) => {
   const data = JSON.parse(json)
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {buildComponent("ROOT", data) || null}
+      <ScrollView>{buildComponent("ROOT", data) || null}</ScrollView>
     </SafeAreaView>
   )
 }
@@ -137,7 +137,7 @@ export default function App() {
   const firstBottomNav = pages?.find((page) => page?.addToBottomNav)
 
   if (!pages) {
-    return (
+    return isLoading ? null : (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <TextNative>There is no page to display</TextNative>
       </View>

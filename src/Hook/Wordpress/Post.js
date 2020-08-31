@@ -36,6 +36,15 @@ function PostFetch({ query, postType, cache, onSetCache, onSetPostFields }) {
   const setIsLoding = useSetRecoilState(isPostsLoading)
 
   postType = postType === "post" ? "posts" : postType
+  if (typeof wpapi[postType] === "undefined") {
+    wpapi[postType] = wpapi.registerRoute(
+      "wp/v2",
+      "/" + postType + "/(?P<id>\\d+)",
+      {
+        params: ["categories", "order", "orderby"]
+      }
+    )
+  }
 
   React.useEffect(() => {
     const key = query ? JSON.stringify({ postType, ...query }) : "noParam"
@@ -48,7 +57,7 @@ function PostFetch({ query, postType, cache, onSetCache, onSetPostFields }) {
         query &&
           Object.keys(query).forEach((key) => {
             const value = query[key]
-            if (value) {
+            if (fetcher?.[key] && value) {
               fetcher = fetcher?.[key](value)
             }
           })
