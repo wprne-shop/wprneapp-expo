@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react"
-import { StyleSheet, View, Text as TextNative, ScrollView } from "react-native"
-import { Container, Image, Text, GridPost, Button } from "./src/Components"
+import {
+  StyleSheet,
+  View,
+  Text as TextNative,
+  ScrollView,
+  RefreshControl
+} from "react-native"
 import {
   NavigationContainer,
   getFocusedRouteNameFromRoute
@@ -43,11 +48,17 @@ const buildComponent = (parent, page) => {
   )
 }
 
-const Page = ({ json }) => {
+const Page = ({ json, refreshing, onRefresh }) => {
   const data = JSON.parse(json)
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView>{buildComponent("ROOT", data) || null}</ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {buildComponent("ROOT", data) || null}
+      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -64,7 +75,7 @@ function getOptions(route, pages) {
 
 const Tab = createBottomTabNavigator()
 
-function BottomBar({ pages, navigation, route }) {
+function BottomBar({ pages, navigation, route, refreshing, onRefresh }) {
   React.useLayoutEffect(() => {
     const options = getOptions(route, pages)
     navigation.setOptions({ ...options })
@@ -96,7 +107,13 @@ function BottomBar({ pages, navigation, route }) {
             page?.addToBottomNav && (
               <Tab.Screen key={id} name={`bottom-${id}`}>
                 {(props) => (
-                  <Page {...props} json={page.json} title={page.name} />
+                  <Page
+                    {...props}
+                    json={page.json}
+                    title={page.name}
+                    onRefresh={onRefresh}
+                    refreshing={refreshing}
+                  />
                 )}
               </Tab.Screen>
             )
@@ -110,29 +127,38 @@ const Stack = createStackNavigator()
 export default function App() {
   const [pages, setPages] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true)
+    setIsLoading(true)
+  }, [])
 
   useEffect(() => {
     SplashScreen.preventAutoHide()
 
-    fetch(config.baseUrl + "wp-admin/admin-ajax.php", {
-      method: "POST",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: "action=wprne_get_page"
-    })
-      .then((res) => {
-        return res.json()
+    if (isLoading) {
+      fetch(config.baseUrl + "wp-admin/admin-ajax.php", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "action=wprne_get_page"
       })
-      .then((data) => {
-        if (data?.pages) {
-          setPages(data?.pages)
-          setIsLoading(false)
-        }
-        SplashScreen.hide()
-      })
-  }, [])
+        .then((res) => {
+          return res.json()
+        })
+        .then((data) => {
+          if (data?.pages) {
+            setPages(data?.pages)
+            setIsLoading(false)
+          }
+          SplashScreen.hide()
+          setRefreshing(false)
+        })
+    }
+  }, [isLoading])
 
   const firstBottomNav = pages?.find((page) => page?.addToBottomNav)
 
@@ -151,7 +177,14 @@ export default function App() {
           <Stack.Navigator>
             {firstBottomNav && (
               <Stack.Screen name="BottomBar">
-                {(props) => <BottomBar {...props} pages={pages} />}
+                {(props) => (
+                  <BottomBar
+                    {...props}
+                    pages={pages}
+                    onRefresh={onRefresh}
+                    refreshing={refreshing}
+                  />
+                )}
               </Stack.Screen>
             )}
             {Array.isArray(pages) &&
@@ -165,7 +198,13 @@ export default function App() {
                   }}
                 >
                   {(props) => (
-                    <Page {...props} json={page.json} title={page.name} />
+                    <Page
+                      {...props}
+                      json={page.json}
+                      title={page.name}
+                      onRefresh={onRefresh}
+                      refreshing={refreshing}
+                    />
                   )}
                 </Stack.Screen>
               ))}
