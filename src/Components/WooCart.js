@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text } from "react-native-web"
+import { View, Text } from "react-native"
 import { useCart, IndexProvider, CartProductRoot } from "../Hook"
 
 export const CartItem = ({ children }) => {

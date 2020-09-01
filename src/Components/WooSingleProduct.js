@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Image } from "react-native-web"
+import { View, Image } from "react-native"
 import { SingleProductRoot, useSingleProduct } from "../Hook"
 import { Carousel } from "./index"
 

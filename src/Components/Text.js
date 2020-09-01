@@ -1,5 +1,6 @@
 import React from "react"
 import { Text as TextUi } from "react-native"
+import HTML from "react-native-render-html"
 import { usePostContent } from "../Hook"
 
 export const Text = ({ title, postContent, ...props }) => {
@@ -14,7 +15,7 @@ export const Text = ({ title, postContent, ...props }) => {
   const { style, ...restProps } = props
 
   return props.isHtml ? (
-    <div dangerouslySetInnerHTML={{ __html: title }} style={style} />
+    <HTML html={title} />
   ) : (
     <TextUi style={style} {...restProps}>
       {title}

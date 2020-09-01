@@ -171,47 +171,49 @@ export default function App() {
   }
 
   return (
-    <RecoilRoot>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <Stack.Navigator>
-            {firstBottomNav && (
-              <Stack.Screen name="BottomBar">
-                {(props) => (
-                  <BottomBar
-                    {...props}
-                    pages={pages}
-                    onRefresh={onRefresh}
-                    refreshing={refreshing}
-                  />
-                )}
-              </Stack.Screen>
-            )}
-            {Array.isArray(pages) &&
-              pages.map((page, id) => (
-                <Stack.Screen
-                  key={id}
-                  name={`page-${id}`}
-                  options={{
-                    title: page.name,
-                    headerShown: page.showHeaderBar
-                  }}
-                >
+    <View style={{ flex: 1 }}>
+      <RecoilRoot>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <Stack.Navigator>
+              {firstBottomNav && (
+                <Stack.Screen name="BottomBar">
                   {(props) => (
-                    <Page
+                    <BottomBar
                       {...props}
-                      json={page.json}
-                      title={page.name}
+                      pages={pages}
                       onRefresh={onRefresh}
                       refreshing={refreshing}
                     />
                   )}
                 </Stack.Screen>
-              ))}
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </RecoilRoot>
+              )}
+              {Array.isArray(pages) &&
+                pages.map((page, id) => (
+                  <Stack.Screen
+                    key={id}
+                    name={`page-${id}`}
+                    options={{
+                      title: page.name,
+                      headerShown: page.showHeaderBar
+                    }}
+                  >
+                    {(props) => (
+                      <Page
+                        {...props}
+                        json={page.json}
+                        title={page.name}
+                        onRefresh={onRefresh}
+                        refreshing={refreshing}
+                      />
+                    )}
+                  </Stack.Screen>
+                ))}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </RecoilRoot>
+    </View>
   )
 }
 

@@ -44,6 +44,10 @@ export const Button = ({ onPressAction, navigateTo, ...props }) => {
             navigation.push(navigateTo || "page-0")
             break
 
+          case "goBack":
+            navigation.goBack()
+            break
+
           case "selectProduct":
             if (globalAction) globalAction("selectProduct", product)
             else setProduct(product)
