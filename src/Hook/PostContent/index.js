@@ -42,10 +42,12 @@ export function usePostContent(postContent) {
 export function usePostImage(postContent) {
   const type = usePostTypeContent()
   const { post } = usePost()
+  const { post: singlePost } = useSinglePost()
   const { product } = useProduct()
   const { product: singleProduct } = useSingleProduct()
   const { product: cartProduct } = useCartItem()
   const postMedia = useMedia(post?.featured_media)
+  const singlePostMedia = useMedia(singlePost?.featured_media)
   const productImage = product?.images?.[0]?.src
   const singleProductImage = singleProduct?.images?.[0]?.src
   const cartImage = cartProduct?.images?.[0]?.src
@@ -54,6 +56,7 @@ export function usePostImage(postContent) {
   if (postContent !== "disable") {
     const images = {
       post: postMedia,
+      singlePost: singlePostMedia,
       product: productImage,
       singleProduct: singleProductImage,
       cartItem: cartImage
