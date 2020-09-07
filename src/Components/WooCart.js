@@ -2,7 +2,7 @@ import React from "react"
 import { View, Text } from "react-native"
 import { useCart, IndexProvider, CartProductRoot } from "../Hook"
 
-export const CartItem = ({ children }) => {
+export const WooCartItem = ({ children }) => {
   const { cart } = useCart()
 
   return Object.keys(cart)?.length ? (

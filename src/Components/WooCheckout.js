@@ -1,21 +1,26 @@
 import React from "react"
 import { View } from "react-native"
+import { WebView } from "react-native-webview"
 import { useCart } from "../Hook"
-export const WooCheckout = ({ children, ...props }) => {
-  const { cart } = useCart()
+import { config } from "../../config"
 
-  let url = "http://localhost/wordpress/checkout/?add-to-cart="
-  Object.keys(cart).forEach((id, index) => {
-    if (index === Object.keys(cart).length - 1) {
-      url += id
+export const WooCheckout = ({ children, ...props }) => {
+  const {
+    cart: { items }
+  } = useCart()
+
+  let url = config.baseUrl + "checkout/?add-to-cart="
+  items.forEach((item, index) => {
+    if (index === items?.length - 1) {
+      url += item?.id
     } else {
-      url += id + ","
+      url += item?.id + ","
     }
   })
 
   return (
-    <View style={{ flex: 1 }}>
-      <iframe title="Checkout" src={url} height="100%" width="100%" />
+    <View style={{ flex: 1, padding: 16 }}>
+      <WebView source={{ uri: url }} />
     </View>
   )
 }

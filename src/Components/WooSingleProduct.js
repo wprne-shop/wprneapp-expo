@@ -1,7 +1,7 @@
 import React from "react"
 import { View, Image } from "react-native"
 import { SingleProductRoot, useSingleProduct } from "../Hook"
-import { Carousel } from "./index"
+import { Carousel } from "./Carousel"
 
 export const WooImageCarousel = (props) => {
   const { images } = useSingleProduct()

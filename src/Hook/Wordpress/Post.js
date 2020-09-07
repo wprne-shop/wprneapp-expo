@@ -6,7 +6,8 @@ import {
   useSetRecoilState,
   useRecoilState
 } from "recoil"
-import { PostTypeProvider, useIndex } from "../index"
+import { PostTypeProvider } from "../PostTypeContext"
+import { useIndex } from "../IndexContext"
 import { wpapi } from "../../Api"
 import { config } from "../../../config"
 
@@ -89,7 +90,7 @@ function PostFetch({ query, postType, cache, onSetCache, onSetPostFields }) {
                 })
                 .catch((error) => {
                   setPosts(response)
-                  setStatus("ok")
+                  setStatus("error")
                   setIsLoding(false)
                 })
             }

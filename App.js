@@ -53,9 +53,10 @@ const Page = ({ json, refreshing, onRefresh }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        contentContainerStyle={{ flexGrow: 1 }}
+        // refreshControl={
+        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        // }
       >
         {buildComponent("ROOT", data) || null}
       </ScrollView>
@@ -81,6 +82,13 @@ function BottomBar({ pages, navigation, route, refreshing, onRefresh }) {
     navigation.setOptions({ ...options })
   }, [navigation, route, pages])
 
+  const bottomNavPages = []
+  pages.forEach((page, index) => {
+    if (page?.addToBottomNav) {
+      bottomNavPages.push({ page, index })
+    }
+  })
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -102,22 +110,19 @@ function BottomBar({ pages, navigation, route, refreshing, onRefresh }) {
       })}
     >
       {Array.isArray(pages) &&
-        pages.map(
-          (page, id) =>
-            page?.addToBottomNav && (
-              <Tab.Screen key={id} name={`bottom-${id}`}>
-                {(props) => (
-                  <Page
-                    {...props}
-                    json={page.json}
-                    title={page.name}
-                    onRefresh={onRefresh}
-                    refreshing={refreshing}
-                  />
-                )}
-              </Tab.Screen>
-            )
-        )}
+        bottomNavPages.map(({ page, index: id }) => (
+          <Tab.Screen key={id} name={`bottom-${id}`}>
+            {(props) => (
+              <Page
+                {...props}
+                json={page.json}
+                title={page.name}
+                onRefresh={onRefresh}
+                refreshing={refreshing}
+              />
+            )}
+          </Tab.Screen>
+        ))}
     </Tab.Navigator>
   )
 }

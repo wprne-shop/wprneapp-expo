@@ -1,7 +1,6 @@
 import React from "react"
 import { View, TouchableWithoutFeedback } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import { useAction, useProduct, usePost } from "../Hook"
+import { useAction } from "../Hook"
 
 export const Container = ({
   children,
@@ -9,32 +8,14 @@ export const Container = ({
   navigateTo,
   ...props
 }) => {
-  const navigation = useNavigation()
-  const globalAction = useAction()
-  const { product } = useProduct()
-  const { post } = usePost()
+  const handleAction = useAction({ navigateTo })
 
   const { style, ...restProps } = props
 
   const handleOnPress = () => {
     if (Array.isArray(onPressAction) && onPressAction.length) {
       onPressAction.forEach((action) => {
-        switch (action) {
-          case "navigate":
-            navigation.push(navigateTo || "page-0")
-            break
-
-          case "selectProduct":
-            globalAction("selectProduct", product)
-            break
-
-          case "selectPost":
-            globalAction("selectPost", post)
-            break
-
-          default:
-            break
-        }
+        handleAction(action)
       })
     }
   }

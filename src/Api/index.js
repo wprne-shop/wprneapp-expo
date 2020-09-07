@@ -1,2 +1,2 @@
 export * from "./wpapi"
-//export * from "./wooapi"
+export * from "./wooapi"

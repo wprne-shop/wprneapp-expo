@@ -1,19 +1,15 @@
 import { usePost, useSinglePost, useMedia } from "../Wordpress"
-import {
-  useProduct,
-  useSingleProduct,
-  useCartItem,
-  useCartTotal,
-  usePostTypeContent
-} from "../index.js"
+import { useProduct, useSingleProduct } from "../Woocommerce"
+import { useCartItem, useCartTotal } from "../Cart"
+import { usePostTypeContent } from "../PostTypeContext"
 
 export function usePostContent(postContent) {
   const type = usePostTypeContent()
   const { post } = usePost()
   const { post: singlePost } = useSinglePost()
-  //const { product } = useProduct()
-  //const { product: singleProduct } = useSingleProduct()
-  const { qty, subtotal, product: cartProduct } = useCartItem()
+  const { product } = useProduct()
+  const { product: singleProduct } = useSingleProduct()
+  let cartItem = useCartItem()
   const total = useCartTotal()
 
   let content = ""
@@ -21,15 +17,17 @@ export function usePostContent(postContent) {
     let postTitle = post?.[postContent]?.rendered ?? post?.[postContent]
     let singlePostTitle =
       singlePost?.[postContent]?.rendered ?? singlePost?.[postContent]
-    //let productTitle = product?.[postContent]
-    //let singleProductTitle = singleProduct?.[postContent]
-    let cartItemTitle = { qty, subtotal, total, ...cartProduct }?.[postContent]
+    let productTitle = product?.[postContent]
+    let singleProductTitle = singleProduct?.[postContent]
+    cartItem = { ...cartItem, total }
+    let cartItemTitle =
+      cartItem?.[postContent]?.rendered ?? cartItem?.[postContent]
 
     const contents = {
       post: postTitle,
       singlePost: singlePostTitle,
-      //product: productTitle,
-      //singleProduct: singleProductTitle,
+      product: productTitle,
+      singleProduct: singleProductTitle,
       cartItem: cartItemTitle
     }
 
@@ -45,12 +43,12 @@ export function usePostImage(postContent) {
   const { post: singlePost } = useSinglePost()
   const { product } = useProduct()
   const { product: singleProduct } = useSingleProduct()
-  const { product: cartProduct } = useCartItem()
+  const cartItem = useCartItem()
   const postMedia = useMedia(post?.featured_media)
   const singlePostMedia = useMedia(singlePost?.featured_media)
   const productImage = product?.images?.[0]?.src
   const singleProductImage = singleProduct?.images?.[0]?.src
-  const cartImage = cartProduct?.images?.[0]?.src
+  const cartImage = cartItem?.image
 
   let image = ""
   if (postContent !== "disable") {

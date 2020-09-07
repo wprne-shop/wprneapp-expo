@@ -1,34 +1,71 @@
-import React from 'react'
-import { fetcher } from '../../Api'
-import useSWR from 'swr'
+import { usePost, useSinglePost, useMedia } from "../Wordpress"
+import {
+  useProduct,
+  useSingleProduct,
+  useCartItem,
+  useCartTotal,
+  usePostTypeContent
+} from "../index.js"
 
-const PostContext = React.createContext()
+export function usePostContent(postContent) {
+  const type = usePostTypeContent()
+  const { post } = usePost()
+  const { post: singlePost } = useSinglePost()
+  const { product } = useProduct()
+  const { product: singleProduct } = useSingleProduct()
+  let cartItem = useCartItem()
+  const total = useCartTotal()
 
-function PostProvider({post, children}) {
-  return (
-    <PostContext.Provider value={post}>      
-        {children}     
-    </PostContext.Provider>
-  )
-}
+  let content = ""
+  if (postContent !== "disable") {
+    let postTitle = post?.[postContent]?.rendered ?? post?.[postContent]
+    let singlePostTitle =
+      singlePost?.[postContent]?.rendered ?? singlePost?.[postContent]
+    let productTitle = product?.[postContent]
+    let singleProductTitle = singleProduct?.[postContent]
+    cartItem = { ...cartItem, total }
+    let cartItemTitle =
+      cartItem?.[postContent]?.rendered ?? cartItem?.[postContent]
 
-function usePost() {
-  const context = React.useContext(PostContext)
-  
-  if (context === undefined) {
-    return false
+    const contents = {
+      post: postTitle,
+      singlePost: singlePostTitle,
+      product: productTitle,
+      singleProduct: singleProductTitle,
+      cartItem: cartItemTitle
+    }
+
+    content = contents[type] ?? contents.post
   }
-  return context
+
+  return content
 }
 
-function useMedia(id){
-  const { data: image } = useSWR(id ? 'media/id=' + id : null, fetcher)  
+export function usePostImage(postContent) {
+  const type = usePostTypeContent()
+  const { post } = usePost()
+  const { post: singlePost } = useSinglePost()
+  const { product } = useProduct()
+  const { product: singleProduct } = useSingleProduct()
+  const cartItem = useCartItem()
+  const postMedia = useMedia(post?.featured_media)
+  const singlePostMedia = useMedia(singlePost?.featured_media)
+  const productImage = product?.images?.[0]?.src
+  const singleProductImage = singleProduct?.images?.[0]?.src
+  const cartImage = cartItem?.image
+
+  let image = ""
+  if (postContent !== "disable") {
+    const images = {
+      post: postMedia,
+      singlePost: singlePostMedia,
+      product: productImage,
+      singleProduct: singleProductImage,
+      cartItem: cartImage
+    }
+
+    image = images[type] ?? images.post
+  }
+
   return image
 }
-
-function useCategories(){
-  const { data: categories } = useSWR('categories', fetcher)  
-  return categories
-}
-
-export {PostProvider, usePost, useMedia, useCategories}

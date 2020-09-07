@@ -7,9 +7,7 @@ import {
   ActionProvider,
   usePosts,
   useProducts,
-  useCart,
-  useSingleProduct,
-  useSinglePost
+  useGridPostAction
 } from "../Hook"
 
 const FlatListComp = ({ children, style, ...props }) => {
@@ -22,9 +20,9 @@ const FlatListComp = ({ children, style, ...props }) => {
   const postData = props.postType === "product" ? products : posts
 
   return (
-    postData &&
+    !!postData?.length &&
     Array.isArray(postData) && (
-      <View style={{ height: "auto", ...style }}>
+      <View style={style}>
         <FlatList
           data={postData}
           keyExtractor={(item) => item.id.toString()}
@@ -39,33 +37,12 @@ const FlatListComp = ({ children, style, ...props }) => {
 }
 
 export const GridPost = ({ postType, ...props }) => {
-  const { setProduct } = useSingleProduct()
-  const { setPost } = useSinglePost()
-  const { addCart } = useCart()
-
-  const globalAction = (action, data) => {
-    switch (action) {
-      case "selectProduct":
-        setProduct(data)
-        break
-
-      case "selectPost":
-        setPost(data)
-        break
-
-      case "addToCart":
-        addCart(data?.product, data?.qty)
-        break
-
-      default:
-        break
-    }
-  }
+  const gridPostAction = useGridPostAction()
 
   if (postType === "product") {
     return (
       <ProductRoot query={props.productQuery}>
-        <ActionProvider value={globalAction}>
+        <ActionProvider value={gridPostAction}>
           <FlatListComp postType={postType} {...props} />
         </ActionProvider>
       </ProductRoot>
@@ -74,7 +51,7 @@ export const GridPost = ({ postType, ...props }) => {
 
   return (
     <PostRoot query={props.postQuery} postType={postType}>
-      <ActionProvider value={globalAction}>
+      <ActionProvider value={gridPostAction}>
         <FlatListComp postType={postType} {...props} />
       </ActionProvider>
     </PostRoot>

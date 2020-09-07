@@ -1,6 +1,6 @@
 import React from "react"
 import { atom, useRecoilState } from "recoil"
-import { PostTypeProvider } from "../index"
+import { PostTypeProvider } from "../PostTypeContext"
 
 const wpSinglePost = atom({
   key: "wpSinglePost",
