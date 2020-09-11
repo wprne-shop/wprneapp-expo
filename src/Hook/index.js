@@ -1,3 +1,4 @@
+export * from "./Pages"
 export * from "./PostContent"
 export * from "./Wordpress"
 export * from "./Woocommerce"

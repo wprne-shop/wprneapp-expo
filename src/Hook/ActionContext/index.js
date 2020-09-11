@@ -30,7 +30,12 @@ function useAction({ navigateTo }) {
   const handleAction = (action, data) => {
     switch (action) {
       case "navigate":
-        navigation.push(navigateTo || "page-0")
+        if (context) {
+          const item = postType === "product" ? product : post
+          navigation.push(navigateTo || "page-0", { item })
+        } else {
+          navigation.push(navigateTo || "page-0")
+        }
         break
 
       case "goBack":

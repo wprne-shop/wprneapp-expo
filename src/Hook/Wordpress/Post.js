@@ -31,7 +31,7 @@ const isPostsLoading = atom({
   default: true
 })
 
-function PostFetch({ query, postType, cache, onSetCache, onSetPostFields }) {
+function PostFetch({ query, postType, cache, onSetCache }) {
   const setPosts = useSetRecoilState(wpPosts)
   const setStatus = useSetRecoilState(postsStatus)
   const setIsLoding = useSetRecoilState(isPostsLoading)
@@ -88,14 +88,14 @@ function PostFetch({ query, postType, cache, onSetCache, onSetPostFields }) {
                   setIsLoding(false)
                   onSetCache(key, newPosts)
                 })
-                .catch((error) => {
+                .catch(() => {
                   setPosts(response)
                   setStatus("error")
                   setIsLoding(false)
                 })
             }
           })
-          .catch((error) => {
+          .catch(() => {
             setPosts([])
             setStatus("error")
             setIsLoding(false)

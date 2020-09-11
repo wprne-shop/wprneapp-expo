@@ -45,7 +45,7 @@ function ProductFetch({ query, cache, onSetCache }) {
           setStatus("ok")
           onSetCache(key, response)
         })
-        .catch((error) => {
+        .catch(() => {
           setProducts([])
           setStatus("error")
         })
@@ -75,7 +75,7 @@ function ProductFetch({ query, cache, onSetCache }) {
             }
             fetchProduct(bestSellerQuery)
           })
-          .catch((error) => {
+          .catch(() => {
             fetchProduct(query)
           })
           .finally(() => {

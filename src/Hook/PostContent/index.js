@@ -65,3 +65,22 @@ export function usePostImage(postContent) {
 
   return image
 }
+
+export function usePostItem() {
+  const type = usePostTypeContent()
+  const { post } = usePost()
+  const { post: singlePost } = useSinglePost()
+  const { product } = useProduct()
+  const { product: singleProduct } = useSingleProduct()
+  const cartItem = useCartItem()
+
+  const items = {
+    post,
+    singlePost,
+    product,
+    singleProduct,
+    cartItem
+  }
+
+  return items?.[type]
+}

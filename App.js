@@ -1,143 +1,15 @@
 import React, { useEffect, useState } from "react"
-import {
-  StyleSheet,
-  View,
-  Text as TextNative,
-  ScrollView,
-  RefreshControl
-} from "react-native"
-import {
-  NavigationContainer,
-  getFocusedRouteNameFromRoute
-} from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
-import { RecoilRoot } from "recoil"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 import { SplashScreen } from "expo"
+import { View } from "react-native"
 import { config } from "./config"
-import { Icon } from "react-native-elements"
-import * as components from "./src/Components"
+import Route from "./src/Route"
+import { useSetPages, useIsLoadingPages } from "./src/Hook"
+import { RecoilRoot } from "recoil"
 
-const buildChild = (parent, page) => {
-  let child =
-    typeof page[parent].nodes !== "undefined"
-      ? page[parent].nodes.map((node) => {
-          return buildComponent(node, page)
-        })
-      : typeof page[parent].linkedNodes !== "undefined"
-      ? Object.values(page[parent].linkedNodes).map((node) => {
-          return buildComponent(node, page)
-        })
-      : null
-
-  return child
-}
-
-const buildComponent = (parent, page) => {
-  let child = buildChild(parent, page)
-  let props =
-    parent === "ROOT"
-      ? { isRoot: true, key: parent, ...page[parent].props }
-      : { key: parent, ...page[parent].props }
-
-  return React.createElement(
-    components[page[parent].type.resolvedName],
-    props,
-    child
-  )
-}
-
-const Page = ({ json, refreshing, onRefresh }) => {
-  const data = JSON.parse(json)
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        // refreshControl={
-        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        // }
-      >
-        {buildComponent("ROOT", data) || null}
-      </ScrollView>
-    </SafeAreaView>
-  )
-}
-
-function getOptions(route, pages) {
-  const routeName = getFocusedRouteNameFromRoute(route) ?? "page-0"
-  const index = routeName.split("-")[1]
-
-  const title = pages?.[index].name || ""
-  const headerShown = pages?.[index].showHeaderBar
-
-  return { title, headerShown }
-}
-
-const Tab = createBottomTabNavigator()
-
-function BottomBar({ pages, navigation, route, refreshing, onRefresh }) {
-  React.useLayoutEffect(() => {
-    const options = getOptions(route, pages)
-    navigation.setOptions({ ...options })
-  }, [navigation, route, pages])
-
-  const bottomNavPages = []
-  pages.forEach((page, index) => {
-    if (page?.addToBottomNav) {
-      bottomNavPages.push({ page, index })
-    }
-  })
-
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused }) => {
-          const index = route.name.split("-")[1]
-          const icon = pages?.[index]?.icon
-          const { name, provider, size, activeColor, inactiveColor } = icon
-          // You can return any component that you like here!
-          return (
-            <Icon
-              name={name}
-              type={provider}
-              size={size}
-              color={focused ? activeColor : inactiveColor}
-            />
-          )
-        },
-        tabBarLabel: ""
-      })}
-    >
-      {Array.isArray(pages) &&
-        bottomNavPages.map(({ page, index: id }) => (
-          <Tab.Screen key={id} name={`bottom-${id}`}>
-            {(props) => (
-              <Page
-                {...props}
-                json={page.json}
-                title={page.name}
-                onRefresh={onRefresh}
-                refreshing={refreshing}
-              />
-            )}
-          </Tab.Screen>
-        ))}
-    </Tab.Navigator>
-  )
-}
-
-const Stack = createStackNavigator()
-
-export default function App() {
-  const [pages, setPages] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true)
-    setIsLoading(true)
-  }, [])
+function Init() {
+  const [isLoading, setIsLoading] = useIsLoadingPages()
+  const setPages = useSetPages()
 
   useEffect(() => {
     SplashScreen.preventAutoHide()
@@ -160,73 +32,22 @@ export default function App() {
             setIsLoading(false)
           }
           SplashScreen.hide()
-          setRefreshing(false)
         })
     }
-  }, [isLoading])
+  }, [isLoading, setPages, setIsLoading, SplashScreen])
 
-  const firstBottomNav = pages?.find((page) => page?.addToBottomNav)
+  return null
+}
 
-  if (!pages) {
-    return isLoading ? null : (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <TextNative>There is no page to display</TextNative>
-      </View>
-    )
-  }
-
+export default function App() {
   return (
     <View style={{ flex: 1 }}>
       <RecoilRoot>
+        <Init />
         <SafeAreaProvider>
-          <NavigationContainer>
-            <Stack.Navigator>
-              {firstBottomNav && (
-                <Stack.Screen name="BottomBar">
-                  {(props) => (
-                    <BottomBar
-                      {...props}
-                      pages={pages}
-                      onRefresh={onRefresh}
-                      refreshing={refreshing}
-                    />
-                  )}
-                </Stack.Screen>
-              )}
-              {Array.isArray(pages) &&
-                pages.map((page, id) => (
-                  <Stack.Screen
-                    key={id}
-                    name={`page-${id}`}
-                    options={{
-                      title: page.name,
-                      headerShown: page.showHeaderBar
-                    }}
-                  >
-                    {(props) => (
-                      <Page
-                        {...props}
-                        json={page.json}
-                        title={page.name}
-                        onRefresh={onRefresh}
-                        refreshing={refreshing}
-                      />
-                    )}
-                  </Stack.Screen>
-                ))}
-            </Stack.Navigator>
-          </NavigationContainer>
+          <Route />
         </SafeAreaProvider>
       </RecoilRoot>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center"
-  }
-})
