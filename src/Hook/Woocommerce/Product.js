@@ -1,126 +1,48 @@
 import React from "react"
-import {
-  RecoilRoot,
-  atom,
-  useRecoilValue,
-  useRecoilState,
-  useSetRecoilState
-} from "recoil"
+import useSWR from "swr"
 import { PostTypeProvider } from "../PostTypeContext"
-import { useIndex } from "../IndexContext"
 import { wooapi } from "../../Api"
 
-const wooProducts = atom({
-  key: "wooProducts",
-  default: []
-})
-
-const wooProductsCache = atom({
-  key: "wooProductsCache",
-  default: []
-})
-
-const wooProductsStatus = atom({
-  key: "wooProductsStatus",
-  default: null
-})
-
-const isWooProductsLoading = atom({
-  key: "isWooProductsLoading",
-  default: true
-})
-
-function ProductFetch({ query, cache, onSetCache }) {
-  const setProducts = useSetRecoilState(wooProducts)
-  const setStatus = useSetRecoilState(wooProductsStatus)
-  const setIsLoading = useSetRecoilState(isWooProductsLoading)
-
-  const fetchProduct = React.useCallback(
-    (query) => {
-      const key = query ? JSON.stringify(query) : "noParam"
-      wooapi
-        .get("products", query)
-        .then((response) => {
-          setProducts(response)
-          setStatus("ok")
-          onSetCache(key, response)
-        })
-        .catch(() => {
-          setProducts([])
-          setStatus("error")
-        })
-        .finally(() => {
-          setIsLoading(false)
-        })
-    },
-    [setProducts, setStatus, setIsLoading]
-  )
-
-  React.useEffect(() => {
-    const key = query ? JSON.stringify(query) : "noParam"
-
-    if (cache[key]) {
-      setProducts(cache[key])
-    } else {
-      setIsLoading(true)
-
-      if (query?.bestSeller) {
-        wooapi
-          .get("reports/top_sellers", { period: "year" })
-          .then((response) => {
-            let bestSellerQuery = { ...query }
-            if (response?.length) {
-              const include = response?.map((item) => item.product_id)
-              bestSellerQuery = { ...query, include }
-            }
-            fetchProduct(bestSellerQuery)
-          })
-          .catch(() => {
-            fetchProduct(query)
-          })
-          .finally(() => {
-            setIsLoading(false)
-          })
-      } else {
-        fetchProduct(query)
-      }
-    }
-  }, [query, fetchProduct, setProducts, setIsLoading])
-
-  return null
+async function fetchProduct(query) {
+  const response = await wooapi.get("products", query)
+  return response
 }
 
-function ProductRoot({ children, query }) {
-  const [cache, setCache] = useRecoilState(wooProductsCache)
+async function fetchData(json) {
+  const param = JSON.parse(json)
+  let { postType, ...query } = param
 
-  const handleSetCache = (key, data) => {
-    setCache((cache) => ({ ...cache, [key]: data }))
+  let products = []
+  if (query?.bestSeller) {
+    let response = await wooapi.get("reports/top_sellers", { period: "year" })
+    let bestSellerQuery = { ...query }
+    if (response?.length) {
+      const include = response?.map((item) => item.product_id)
+      bestSellerQuery = { ...query, include }
+    }
+    products = await fetchProduct(bestSellerQuery)
+  } else {
+    products = await fetchProduct(query)
   }
 
-  return (
-    <RecoilRoot>
-      <ProductFetch query={query} cache={cache} onSetCache={handleSetCache} />
-      <PostTypeProvider value="product">{children}</PostTypeProvider>
-    </RecoilRoot>
-  )
+  return products
 }
 
-function useProducts() {
-  const products = useRecoilValue(wooProducts)
-  const status = useRecoilValue(wooProductsStatus)
-  const isLoading = useRecoilValue(isWooProductsLoading)
+function ProductRoot({ children, onLoading, onSetData, query = {} }) {
+  const json = JSON.stringify({ postType: "product", ...query })
+  const { data, isValidating } = useSWR(json, fetchData)
 
-  return { products, status, isLoading }
+  React.useEffect(() => {
+    if (typeof onLoading === "function") {
+      onLoading(isValidating)
+    }
+  }, [isValidating, onLoading])
+
+  React.useEffect(() => {
+    onSetData(data)
+  }, [data, onSetData])
+
+  return <PostTypeProvider value="product">{children}</PostTypeProvider>
 }
 
-function useProduct() {
-  const products = useRecoilValue(wooProducts)
-  const status = useRecoilValue(wooProductsStatus)
-  const isLoading = useRecoilValue(isWooProductsLoading)
-  const index = useIndex()
-  const product = products?.[index]
-
-  return { product, status, isLoading }
-}
-
-export { ProductRoot, useProducts, useProduct }
+export { ProductRoot }

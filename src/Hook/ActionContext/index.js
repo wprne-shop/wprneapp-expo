@@ -1,9 +1,9 @@
 import React from "react"
-import { useProduct, useSingleProduct } from "../Woocommerce"
-import { usePost, useSinglePost } from "../Wordpress"
-import { useCart, useCartItem } from "../Cart"
+import { useSingleProduct } from "../Woocommerce"
+import { useSinglePost } from "../Wordpress"
+import { useCart } from "../Cart"
 import { useForm } from "../Form"
-import { usePostType, usePostTypeContent } from "../PostTypeContext"
+import { useItem } from "../PostContent"
 import { useNavigation } from "@react-navigation/native"
 
 const ActionContext = React.createContext()
@@ -14,24 +14,19 @@ function ActionProvider({ value, children }) {
   )
 }
 
-function useAction({ navigateTo }) {
+function useAction({ navigateTo = "" }) {
   const context = React.useContext(ActionContext)
   const navigation = useNavigation()
   const form = useForm()
-  const { product } = useProduct()
-  const { post } = usePost()
+  const item = useItem()
   const { addCart, addQty, reduceQty } = useCart()
-  const cartItem = useCartItem()
-  const { product: singleProduct, setProduct } = useSingleProduct()
-  const { post: singlePost, setPost } = useSinglePost()
-  const postType = usePostType()
-  const postTypeContent = usePostTypeContent()
+  const { setProduct } = useSingleProduct()
+  const { setPost } = useSinglePost()
 
-  const handleAction = (action, data) => {
+  const handleAction = (action) => {
     switch (action) {
       case "navigate":
         if (context) {
-          const item = postType === "product" ? product : post
           navigation.push(navigateTo || "page-0", { item })
         } else {
           navigation.push(navigateTo || "page-0")
@@ -43,35 +38,26 @@ function useAction({ navigateTo }) {
         break
 
       case "selectProduct":
-        if (context) context("selectProduct", product)
-        else setProduct(product)
+        if (context) context("selectProduct", item)
+        else setProduct(item)
         break
 
       case "selectPost":
-        if (context) context("selectPost", post)
-        else setPost(post)
+        if (context) context("selectPost", item)
+        else setPost(item)
         break
 
       case "addToCart":
-        if (postType === "product") {
-          const data =
-            postTypeContent === "singleProduct" ? singleProduct : product
-          if (context) context("addToCart", { ...data, qty: 1 })
-          else addCart(data, 1)
-        } else {
-          const data = postTypeContent === "singlePost" ? singlePost : post
-          if (context) context("addToCart", { ...data, qty: 1 })
-          else addCart(data, 1)
-        }
-
+        if (context) context("addToCart", { ...item, qty: 1 })
+        else addCart(item, 1)
         break
 
       case "addQty":
-        addQty(cartItem?.id)
+        addQty(item?.id)
         break
 
       case "reduceQty":
-        reduceQty(cartItem?.id)
+        reduceQty(item?.id)
         break
 
       case "submit":

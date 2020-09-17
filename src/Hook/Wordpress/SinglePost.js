@@ -1,6 +1,7 @@
 import React from "react"
-import { atom, useRecoilState } from "recoil"
+import { atom, useRecoilState, useRecoilValue } from "recoil"
 import { PostTypeProvider } from "../PostTypeContext"
+import { ItemProvider } from "../PostContent"
 
 const wpSinglePost = atom({
   key: "wpSinglePost",
@@ -13,9 +14,10 @@ function useSinglePost() {
 }
 
 function SinglePostRoot({ children, postType }) {
+  const singlePost = useRecoilValue(wpSinglePost)
   return (
     <PostTypeProvider value={[postType, "singlePost"]}>
-      {children}
+      <ItemProvider value={singlePost}>{children}</ItemProvider>
     </PostTypeProvider>
   )
 }

@@ -17,10 +17,18 @@ export const WooCheckout = ({ children, ...props }) => {
       url += item?.id + ","
     }
   })
+  url += "&qty="
+  items.forEach((item, index) => {
+    if (index === items?.length - 1) {
+      url += item?.qty
+    } else {
+      url += item?.qty + ","
+    }
+  })
 
   return (
     <View style={{ flex: 1, padding: 16 }}>
-      <WebView source={{ uri: url }} />
+      <WebView source={{ uri: url }} scalesPageToFit={false} />
     </View>
   )
 }

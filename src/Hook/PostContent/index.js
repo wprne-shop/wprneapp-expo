@@ -1,86 +1,45 @@
-import { usePost, useSinglePost, useMedia } from "../Wordpress"
-import { useProduct, useSingleProduct } from "../Woocommerce"
-import { useCartItem, useCartTotal } from "../Cart"
+import React from "react"
 import { usePostTypeContent } from "../PostTypeContext"
 
+const ItemContext = React.createContext()
+
+export function ItemProvider({ value, children }) {
+  return <ItemContext.Provider value={value}>{children}</ItemContext.Provider>
+}
+
+export function useItem() {
+  const context = React.useContext(ItemContext)
+
+  if (context === undefined) {
+    return {}
+  }
+
+  return context
+}
+
 export function usePostContent(postContent) {
-  const type = usePostTypeContent()
-  const { post } = usePost()
-  const { post: singlePost } = useSinglePost()
-  const { product } = useProduct()
-  const { product: singleProduct } = useSingleProduct()
-  let cartItem = useCartItem()
-  const total = useCartTotal()
-
-  let content = ""
-  if (postContent !== "disable") {
-    let postTitle = post?.[postContent]?.rendered ?? post?.[postContent]
-    let singlePostTitle =
-      singlePost?.[postContent]?.rendered ?? singlePost?.[postContent]
-    let productTitle = product?.[postContent]
-    let singleProductTitle = singleProduct?.[postContent]
-    cartItem = { ...cartItem, total }
-    let cartItemTitle =
-      cartItem?.[postContent]?.rendered ?? cartItem?.[postContent]
-
-    const contents = {
-      post: postTitle,
-      singlePost: singlePostTitle,
-      product: productTitle,
-      singleProduct: singleProductTitle,
-      cartItem: cartItemTitle
-    }
-
-    content = contents[type] ?? contents.post
-  }
-
-  return content
+  const item = useItem()
+  return item?.[postContent]?.rendered ?? item?.[postContent]
 }
 
-export function usePostImage(postContent) {
+export function usePostImage() {
   const type = usePostTypeContent()
-  const { post } = usePost()
-  const { post: singlePost } = useSinglePost()
-  const { product } = useProduct()
-  const { product: singleProduct } = useSingleProduct()
-  const cartItem = useCartItem()
-  const postMedia = useMedia(post?.featured_media)
-  const singlePostMedia = useMedia(singlePost?.featured_media)
-  const productImage = product?.images?.[0]?.src
-  const singleProductImage = singleProduct?.images?.[0]?.src
-  const cartImage = cartItem?.image
+  const item = useItem()
 
-  let image = ""
-  if (postContent !== "disable") {
-    const images = {
-      post: postMedia,
-      singlePost: singlePostMedia,
-      product: productImage,
-      singleProduct: singleProductImage,
-      cartItem: cartImage
-    }
+  switch (type) {
+    case "post":
+    case "singlePost":
+      return item?._embedded?.["wp:featuredmedia"]?.[0]?.source_url
 
-    image = images[type] ?? images.post
+    case "product":
+    case "singleProduct":
+      return item?.images?.[0]?.src
+
+    case "cartItem":
+    case "order":
+      return item?.image
+
+    default:
+      return ""
   }
-
-  return image
-}
-
-export function usePostItem() {
-  const type = usePostTypeContent()
-  const { post } = usePost()
-  const { post: singlePost } = useSinglePost()
-  const { product } = useProduct()
-  const { product: singleProduct } = useSingleProduct()
-  const cartItem = useCartItem()
-
-  const items = {
-    post,
-    singlePost,
-    product,
-    singleProduct,
-    cartItem
-  }
-
-  return items?.[type]
 }

@@ -1,20 +1,20 @@
 import React from "react"
 import { View, Text } from "react-native"
-import { useCart, IndexProvider, CartRoot } from "../Hook"
+import { useCart, ItemProvider, CartRoot } from "../Hook"
 
 export const CartItem = ({ children }) => {
-  const {
-    cart: { items }
-  } = useCart()
+  const { cartItems } = useCart()
 
-  return items.length > 0 ? (
-    items.map((item, index) => (
-      <IndexProvider key={item.id} value={index}>
+  return cartItems.length > 0 ? (
+    cartItems.map((item) => (
+      <ItemProvider value={item} key={item?.id}>
         {children}
-      </IndexProvider>
+      </ItemProvider>
     ))
   ) : (
-    <Text>Cart is empty</Text>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text>Cart is empty</Text>
+    </View>
   )
 }
 

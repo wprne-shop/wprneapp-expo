@@ -14,12 +14,8 @@ export const Text = ({ title, postContent, ...props }) => {
 
   const { style, ...restProps } = props
 
-  if (props.html) {
-  }
-
   return props.isHtml ? (
     <HTML
-      containerStyle={style}
       html={title}
       tagsStyles={{
         span: style,

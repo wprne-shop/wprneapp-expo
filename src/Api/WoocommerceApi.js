@@ -39,7 +39,7 @@ WooCommerceAPI.prototype._setDefaultsOptions = function (opt) {
   this.wpAPI = opt.wpAPI || false
   this.wpAPIPrefix = opt.wpAPIPrefix || "wp-json"
   this.version = opt.version || "v3"
-  this.isSsl = /^https/i.test(this.url)
+  //this.isSsl = /^https/i.test(this.url)
   this.consumerKey = opt.consumerKey
   this.consumerSecret = opt.consumerSecret
   this.verifySsl = false === opt.verifySsl ? false : true
@@ -141,9 +141,9 @@ WooCommerceAPI.prototype._getOAuth = function () {
 WooCommerceAPI.prototype.join = function (obj, separator) {
   var arr = []
   for (var key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      arr.push(key + "=" + obj[key])
-    }
+    //if (obj.hasOwnProperty(key)) {
+    arr.push(key + "=" + obj[key])
+    //}
   }
   return arr.join(separator)
 }

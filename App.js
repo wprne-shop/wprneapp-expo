@@ -6,6 +6,7 @@ import { config } from "./config"
 import Route from "./src/Route"
 import { useSetPages, useIsLoadingPages } from "./src/Hook"
 import { RecoilRoot } from "recoil"
+import { SWRConfig } from "swr"
 
 function Init() {
   const [isLoading, setIsLoading] = useIsLoadingPages()
@@ -34,7 +35,7 @@ function Init() {
           SplashScreen.hide()
         })
     }
-  }, [isLoading, setPages, setIsLoading, SplashScreen])
+  }, [isLoading, setPages, setIsLoading])
 
   return null
 }
@@ -43,10 +44,18 @@ export default function App() {
   return (
     <View style={{ flex: 1 }}>
       <RecoilRoot>
-        <Init />
-        <SafeAreaProvider>
-          <Route />
-        </SafeAreaProvider>
+        <SWRConfig
+          value={{
+            revalidateOnFocus: false,
+            refreshInterval: 0,
+            errorRetryCount: 3
+          }}
+        >
+          <Init />
+          <SafeAreaProvider>
+            <Route />
+          </SafeAreaProvider>
+        </SWRConfig>
       </RecoilRoot>
     </View>
   )
