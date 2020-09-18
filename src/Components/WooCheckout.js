@@ -49,8 +49,9 @@ export const WooCheckout = ({ children, ...props }) => {
   const handleMessage = (event) => {
     const order_id = event.nativeEvent.data
     if (orders.indexOf(order_id) === -1) {
+      console.log("order id", order_id)
       writeItemToStorage([...orders, order_id])
-      resetCart()
+      //resetCart()
     }
   }
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { FlatList, View } from "react-native"
+import { useFocusEffect } from "@react-navigation/native"
 import {
   PostRoot,
   ProductRoot,
@@ -33,7 +34,13 @@ export const FlatListComp = ({ data, children, style, ...props }) => {
 }
 
 const OrderList = (props) => {
-  const { items: data } = useGetOrderData()
+  const { items: data, mutateData } = useGetOrderData()
+
+  useFocusEffect(
+    React.useCallback(() => {
+      mutateData()
+    }, [mutateData])
+  )
 
   return (
     <OrderRoot query={props.orderQuery}>

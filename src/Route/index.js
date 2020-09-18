@@ -2,7 +2,8 @@
 import React from "react"
 import {
   NavigationContainer,
-  getFocusedRouteNameFromRoute
+  getFocusedRouteNameFromRoute,
+  StackActions
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { createSharedElementStackNavigator } from "react-navigation-shared-element"
@@ -39,6 +40,7 @@ function BottomBar({ navigation, route }) {
 
   return (
     <Tab.Navigator
+      lazy={false}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused }) => {
           const index = route.name.split("-")[1]
@@ -65,8 +67,8 @@ function BottomBar({ navigation, route }) {
   )
 }
 
-// const Stack = createStackNavigator()
-const Stack = createSharedElementStackNavigator()
+const Stack = createStackNavigator()
+//const Stack = createSharedElementStackNavigator()
 
 export default function Route() {
   const pages = useGetPages()
@@ -87,19 +89,19 @@ export default function Route() {
                 title: page.name,
                 headerShown: page.showHeaderBar
               }}
-              sharedElements={(route, otherRoute, showing) => {
-                const { item } = route.params
-                if (item?.id) {
-                  return [
-                    {
-                      id: `item.${item.id}.image`,
-                      animation: "move",
-                      resize: "clip"
-                    }
-                  ]
-                }
-                return undefined
-              }}
+              // sharedElements={(route, otherRoute, showing) => {
+              //   const { item } = route.params
+              //   if (item?.id) {
+              //     return [
+              //       {
+              //         id: `item.${item.id}.image`,
+              //         animation: "move",
+              //         resize: "clip"
+              //       }
+              //     ]
+              //   }
+              //   return undefined
+              // }}
               component={Page}
             />
           ))}

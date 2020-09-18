@@ -1,5 +1,5 @@
 import React from "react"
-import useSWR from "swr"
+import useSWR, { mutate } from "swr"
 import { PostTypeProvider } from "../PostTypeContext"
 import { wooapi } from "../../Api"
 import { useAsyncStorage } from "@react-native-community/async-storage"
@@ -69,7 +69,7 @@ function useGetOrderData() {
     return { ...order, line_items, line_item, image: line_items?.[0]?.image }
   })
 
-  return { items, isLoading: isValidating }
+  return { items, isLoading: isValidating, mutateData: readItemFromStorage }
 }
 
 function OrderRoot({ children, onLoading, onSetData }) {
