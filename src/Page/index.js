@@ -27,10 +27,13 @@ const buildComponent = (parent, page) => {
       ? { isRoot: true, key: parent, ...page[parent].props }
       : { key: parent, ...page[parent].props }
 
-  return React.createElement(
-    components[page[parent].type.resolvedName],
-    props,
-    child
+  return (
+    components[page[parent]?.type?.resolvedName] &&
+    React.createElement(
+      components[page[parent].type.resolvedName],
+      props,
+      child
+    )
   )
 }
 

@@ -17,7 +17,7 @@ async function fetchData(json) {
     let response = await wooapi.get("reports/top_sellers", { period: "year" })
     let bestSellerQuery = { ...query }
     if (response?.length) {
-      const include = response?.map((item) => item.product_id)
+      const include = response?.map((item) => item.product_id).join()
       bestSellerQuery = { ...query, include }
     }
     products = await fetchProduct(bestSellerQuery)

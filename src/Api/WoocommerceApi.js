@@ -155,6 +155,7 @@ WooCommerceAPI.prototype.getRequestUrl = function (method, endpoint, data) {
     method: method,
     encoding: this.encoding,
     timeout: this.timeout,
+    credential: "same-origin",
     headers: {
       "User-Agent": "WooCommerce API React Native/" + this.classVersion,
       "Content-Type": "application/json",
@@ -221,6 +222,7 @@ WooCommerceAPI.prototype._request = function (
     method: method,
     encoding: this.encoding,
     timeout: this.timeout,
+    credential: "same-origin",
     headers: {
       "User-Agent": "WooCommerce API React Native/" + this.classVersion,
       "Content-Type": "application/json",
@@ -265,6 +267,7 @@ WooCommerceAPI.prototype._request = function (
   // console.log(requestUrl);
 
   return fetch(requestUrl, {
+    credential: "same-origin",
     headers: {
       "User-Agent": "WooCommerce API React Native/" + this.classVersion,
       "Content-Type": "application/json"

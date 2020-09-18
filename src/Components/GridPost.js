@@ -6,7 +6,8 @@ import {
   OrderRoot,
   ItemProvider,
   ActionProvider,
-  useGridPostAction
+  useGridPostAction,
+  useGetOrderData
 } from "../Hook"
 
 export const FlatListComp = ({ data, children, style, ...props }) => {
@@ -31,6 +32,18 @@ export const FlatListComp = ({ data, children, style, ...props }) => {
   )
 }
 
+const OrderList = (props) => {
+  const { items: data } = useGetOrderData()
+
+  return (
+    <OrderRoot query={props.orderQuery}>
+      <ActionProvider value={props.gridPostAction}>
+        <FlatListComp data={data} postType={props.postType} {...props} />
+      </ActionProvider>
+    </OrderRoot>
+  )
+}
+
 export const GridPost = ({ postType, ...props }) => {
   const gridPostAction = useGridPostAction()
   const [data, setData] = useState()
@@ -51,11 +64,11 @@ export const GridPost = ({ postType, ...props }) => {
 
   if (postType === "order") {
     return (
-      <OrderRoot query={props.orderQuery} onSetData={handleSetData}>
-        <ActionProvider value={gridPostAction}>
-          <FlatListComp data={data} postType={postType} {...props} />
-        </ActionProvider>
-      </OrderRoot>
+      <OrderList
+        gridPostAction={gridPostAction}
+        postType={postType}
+        {...props}
+      />
     )
   }
 

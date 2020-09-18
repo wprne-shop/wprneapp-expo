@@ -1,46 +1,30 @@
 import React from "react"
-import { RecoilRoot } from "recoil"
 import useSWR from "swr"
 import { PostTypeProvider } from "../PostTypeContext"
-import { useSetItems } from "../PostContent"
 import { wooapi } from "../../Api"
+import { useAsyncStorage } from "@react-native-community/async-storage"
 
 async function fetchData(json) {
   const param = JSON.parse(json)
   let { postType, ...query } = param
-
   const response = await wooapi.get(postType + "s", query)
-  return response.data
+  return response
 }
 
-function SetItems({ orders, products }) {
-  const setItems = useSetItems()
+function useGetOrderData() {
+  const { getItem } = useAsyncStorage("userOrders")
+  const [orderIds, setOrderIds] = React.useState([])
+  const { data: orders, isValidating } = useSWR(
+    orderIds?.length
+      ? JSON.stringify({
+          postType: "order",
+          include: orderIds.join()
+        })
+      : null,
+    fetchData,
+    { revalidateOnFocus: true }
+  )
 
-  React.useEffect(() => {
-    const items = orders?.map((order) => {
-      const line_items = order?.line_items?.map((line_item) => {
-        const product_id = line_item?.product_id
-        const product = products?.find((product) => product?.id === product_id)
-        return { ...line_item, image: product?.images?.[0]?.src }
-      })
-
-      const line_item = line_items?.reduce(
-        (acc, item) => `${acc} ${item?.name} x ${item?.quantity} \n`,
-        ""
-      )
-
-      return { ...order, line_items, line_item, image: line_items?.[0]?.image }
-    })
-
-    setItems(items)
-  }, [orders, setItems, products])
-
-  return null
-}
-
-function OrderRoot({ children, onLoading, query = {} }) {
-  const json = JSON.stringify({ postType: "order", ...query })
-  const { data: orders, isValidating } = useSWR(json, fetchData)
   const { data: products } = useSWR(() => {
     let ids = []
     if (Array.isArray(orders)) {
@@ -52,7 +36,7 @@ function OrderRoot({ children, onLoading, query = {} }) {
     }
 
     return (
-      ids.length &&
+      ids?.length &&
       JSON.stringify({
         postType: "product",
         include: ids.join()
@@ -60,18 +44,36 @@ function OrderRoot({ children, onLoading, query = {} }) {
     )
   }, fetchData)
 
-  React.useEffect(() => {
-    if (typeof onLoading === "function") {
-      onLoading(isValidating)
-    }
-  }, [isValidating, onLoading])
+  const readItemFromStorage = React.useCallback(async () => {
+    const item = await getItem()
+    const items = JSON.parse(item)
+    setOrderIds(items || [])
+  }, [])
 
-  return (
-    <RecoilRoot>
-      <SetItems orders={orders} products={products} />
-      <PostTypeProvider value="order">{children}</PostTypeProvider>
-    </RecoilRoot>
-  )
+  React.useEffect(() => {
+    readItemFromStorage()
+  }, [readItemFromStorage])
+
+  const items = orders?.map((order) => {
+    const line_items = order?.line_items?.map((line_item) => {
+      const product_id = line_item?.product_id
+      const product = products?.find((product) => product?.id === product_id)
+      return { ...line_item, image: product?.images?.[0]?.src }
+    })
+
+    const line_item = line_items?.reduce(
+      (acc, item) => `${acc} ${item?.name} x ${item?.quantity} \n`,
+      ""
+    )
+
+    return { ...order, line_items, line_item, image: line_items?.[0]?.image }
+  })
+
+  return { items, isLoading: isValidating }
 }
 
-export { OrderRoot }
+function OrderRoot({ children, onLoading, onSetData }) {
+  return <PostTypeProvider value="order">{children}</PostTypeProvider>
+}
+
+export { OrderRoot, useGetOrderData }
