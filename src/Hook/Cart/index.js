@@ -1,7 +1,6 @@
 import React from "react"
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil"
 import { PostTypeProvider } from "../PostTypeContext"
-import { useMedia } from "../Wordpress"
 
 export const generalCart = atom({
   key: "generalCart",
@@ -67,12 +66,11 @@ function useCart() {
     }
   }
 
-  const priceField = cart.priceField
+  const resetCart = () => {
+    setCart((cart) => ({ ...cart, items: [] }))
+  }
 
-  let total = 0
-  cart?.items?.forEach((item) => {
-    total += item?.qty * item?.[priceField]
-  })
+  const priceField = cart.priceField
 
   const cartItems = items?.map((item) => {
     return {
@@ -80,36 +78,23 @@ function useCart() {
       subtotal: item.qty * item[priceField],
       image:
         item?.images?.[0]?.src ??
-        item?._embedded?.["wp:featuredmedia"]?.[0]?.source_url,
-      total
+        item?._embedded?.["wp:featuredmedia"]?.[0]?.source_url
     }
   })
 
-  return { cart, cartItems, addCart, addQty, reduceQty }
+  return { cart, cartItems, addCart, addQty, reduceQty, resetCart }
 }
 
-function useCartItem(index) {
+function useCartTotal() {
   const cart = useRecoilValue(generalCart)
   const priceField = cart.priceField
-  const item = cart?.items?.[index]
-    ? { ...cart.items[index], subtotal: 0 }
-    : { qty: null, subtotal: 0 }
-  const postMedia = useMedia(item?.featured_media)
-
-  if (item.qty) {
-    item["subtotal"] = item.qty * item[priceField]
-  }
-
-  item["image"] = item?.images?.[0]?.src ?? postMedia
 
   let total = 0
   cart?.items?.forEach((item) => {
     total += item?.qty * item?.[priceField]
   })
 
-  item["total"] = total
-
-  return item
+  return total
 }
 
 function CartRoot({ children, postType = "", priceField = "" }) {
@@ -126,4 +111,4 @@ function CartRoot({ children, postType = "", priceField = "" }) {
   )
 }
 
-export { CartRoot, useCart, useCartItem }
+export { CartRoot, useCart, useCartTotal }

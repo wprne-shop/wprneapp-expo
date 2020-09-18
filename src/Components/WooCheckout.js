@@ -7,7 +7,8 @@ import { useAsyncStorage } from "@react-native-community/async-storage"
 
 export const WooCheckout = ({ children, ...props }) => {
   const {
-    cart: { items }
+    cart: { items },
+    resetCart
   } = useCart()
 
   const { getItem, setItem } = useAsyncStorage("userOrders")
@@ -49,6 +50,7 @@ export const WooCheckout = ({ children, ...props }) => {
     const order_id = event.nativeEvent.data
     if (orders.indexOf(order_id) === -1) {
       writeItemToStorage([...orders, order_id])
+      resetCart()
     }
   }
 

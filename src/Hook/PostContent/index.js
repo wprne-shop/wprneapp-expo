@@ -1,5 +1,6 @@
 import React from "react"
 import { usePostTypeContent } from "../PostTypeContext"
+import { useCartTotal } from "../Cart"
 
 const ItemContext = React.createContext()
 
@@ -19,6 +20,11 @@ export function useItem() {
 
 export function usePostContent(postContent) {
   const item = useItem()
+  const type = usePostTypeContent()
+  const cartTotal = useCartTotal()
+  if (type === "cartItem" && postContent === "total") {
+    return cartTotal
+  }
   return item?.[postContent]?.rendered ?? item?.[postContent]
 }
 
