@@ -222,7 +222,6 @@ WooCommerceAPI.prototype._request = function (
     method: method,
     encoding: this.encoding,
     timeout: this.timeout,
-    credential: "same-origin",
     headers: {
       "User-Agent": "WooCommerce API React Native/" + this.classVersion,
       "Content-Type": "application/json",
@@ -263,11 +262,7 @@ WooCommerceAPI.prototype._request = function (
     requestUrl += "&" + this.join(data, "&")
   }
 
-  // console.log('encode', params.qs.oauth_signature);
-  // console.log(requestUrl);
-
   return fetch(requestUrl, {
-    credential: "same-origin",
     headers: {
       "User-Agent": "WooCommerce API React Native/" + this.classVersion,
       "Content-Type": "application/json"
@@ -280,7 +275,7 @@ WooCommerceAPI.prototype._request = function (
       if (typeof callback == "function") {
         callback()
       }
-      return responseData
+      return { data: responseData }
     })
     .catch((error, data) => {
       console.log("error network -", error, data)

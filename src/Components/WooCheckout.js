@@ -13,23 +13,29 @@ export const WooCheckout = ({ children, ...props }) => {
 
   const { getItem, setItem } = useAsyncStorage("userOrders")
   const [orders, setOrders] = React.useState([])
+  const [url, setUrl] = React.useState("")
 
-  let url = config.baseUrl + "checkout/?add-to-cart="
-  items.forEach((item, index) => {
-    if (index === items?.length - 1) {
-      url += item?.id
-    } else {
-      url += item?.id + ","
+  React.useEffect(() => {
+    let url = config.baseUrl + "checkout/?add-to-cart="
+    if (items?.length) {
+      items.forEach((item, index) => {
+        if (index === items?.length - 1) {
+          url += item?.id
+        } else {
+          url += item?.id + ","
+        }
+      })
+      url += "&qty="
+      items.forEach((item, index) => {
+        if (index === items?.length - 1) {
+          url += item?.qty
+        } else {
+          url += item?.qty + ","
+        }
+      })
+      setUrl(url)
     }
-  })
-  url += "&qty="
-  items.forEach((item, index) => {
-    if (index === items?.length - 1) {
-      url += item?.qty
-    } else {
-      url += item?.qty + ","
-    }
-  })
+  }, [items])
 
   const readItemFromStorage = React.useCallback(async () => {
     const item = await getItem()
@@ -50,7 +56,7 @@ export const WooCheckout = ({ children, ...props }) => {
     const order_id = event.nativeEvent.data
     if (orders.indexOf(order_id) === -1) {
       writeItemToStorage([...orders, order_id])
-      //resetCart()
+      resetCart()
     }
   }
 

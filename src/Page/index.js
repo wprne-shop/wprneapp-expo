@@ -43,6 +43,20 @@ const Page = () => {
   const index = name.split("-")[1]
   const json = pages?.[index]?.json
   const data = json && JSON.parse(json)
+
+  if (pages?.[index]?.showHeaderBar) {
+    return (
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        // refreshControl={
+        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        // }
+      >
+        {buildComponent("ROOT", data) || null}
+      </ScrollView>
+    )
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView

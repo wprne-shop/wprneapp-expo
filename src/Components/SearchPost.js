@@ -5,45 +5,49 @@ import debounce from "lodash.debounce"
 import {
   PostRoot,
   ProductRoot,
-  ActionProvider,
-  useGridPostAction
+  useGetProductData,
+  useGetPostData
 } from "../Hook"
 import { FlatListComp } from "./GridPost"
 
-export const SearchPostComp = ({
-  postType,
-  searchQuery,
-  onLoading,
-  ...props
-}) => {
-  const gridPostAction = useGridPostAction()
-  const [data, setData] = React.useState()
+const ProductList = ({ query, postType, onLoading, ...props }) => {
+  const { data, isLoading } = useGetProductData(query)
 
-  const handleSetData = (data) => {
-    setData(data)
-  }
+  React.useEffect(() => {
+    onLoading(isLoading)
+  }, [isLoading, onLoading])
+
+  return (
+    <ProductRoot query={query}>
+      <FlatListComp data={data} postType={postType} {...props} />
+    </ProductRoot>
+  )
+}
+
+const PostList = ({ query, postType, onLoading, ...props }) => {
+  const { data, isLoading } = useGetPostData(query, postType)
+
+  React.useEffect(() => {
+    onLoading(isLoading)
+  }, [isLoading, onLoading])
+
+  return (
+    <PostRoot query={query}>
+      <FlatListComp data={data} postType={postType} {...props} />
+    </PostRoot>
+  )
+}
+
+export const SearchPostComp = ({ searchQuery, ...props }) => {
+  const postType = props?.postType
 
   return postType === "product" ? (
-    <ProductRoot
+    <ProductList
       query={{ ...props.productQuery, search: searchQuery }}
-      onLoading={onLoading}
-      onSetData={handleSetData}
-    >
-      <ActionProvider value={gridPostAction}>
-        <FlatListComp postType={postType} data={data} {...props} />
-      </ActionProvider>
-    </ProductRoot>
+      {...props}
+    />
   ) : (
-    <PostRoot
-      query={{ ...props.postQuery, search: searchQuery }}
-      postType={postType}
-      onLoading={onLoading}
-      onSetData={handleSetData}
-    >
-      <ActionProvider value={gridPostAction}>
-        <FlatListComp postType={postType} data={data} {...props} />
-      </ActionProvider>
-    </PostRoot>
+    <PostList query={{ ...props.postQuery, search: searchQuery }} {...props} />
   )
 }
 

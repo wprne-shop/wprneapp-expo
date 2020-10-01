@@ -5,7 +5,7 @@ import { wooapi } from "../../Api"
 
 async function fetchProduct(query) {
   const response = await wooapi.get("products", query)
-  return response
+  return response?.data
 }
 
 async function fetchData(json) {
@@ -16,8 +16,8 @@ async function fetchData(json) {
   if (query?.bestSeller) {
     let response = await wooapi.get("reports/top_sellers", { period: "year" })
     let bestSellerQuery = { ...query }
-    if (response?.length) {
-      const include = response?.map((item) => item.product_id).join()
+    if (response?.data?.length) {
+      const include = response?.data?.map((item) => item.product_id).join()
       bestSellerQuery = { ...query, include }
     }
     products = await fetchProduct(bestSellerQuery)
@@ -28,21 +28,14 @@ async function fetchData(json) {
   return products
 }
 
-function ProductRoot({ children, onLoading, onSetData, query = {} }) {
+function useGetProductData(query = {}) {
   const json = JSON.stringify({ postType: "product", ...query })
   const { data, isValidating } = useSWR(json, fetchData)
+  return { data, isLoading: isValidating }
+}
 
-  React.useEffect(() => {
-    if (typeof onLoading === "function") {
-      onLoading(isValidating)
-    }
-  }, [isValidating, onLoading])
-
-  React.useEffect(() => {
-    onSetData(data)
-  }, [data, onSetData])
-
+function ProductRoot({ children }) {
   return <PostTypeProvider value="product">{children}</PostTypeProvider>
 }
 
-export { ProductRoot }
+export { ProductRoot, useGetProductData }

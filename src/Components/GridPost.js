@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { FlatList, View } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 import {
@@ -6,9 +6,9 @@ import {
   ProductRoot,
   OrderRoot,
   ItemProvider,
-  ActionProvider,
-  useGridPostAction,
-  useGetOrderData
+  useGetOrderData,
+  useGetProductData,
+  useGetPostData
 } from "../Hook"
 
 export const FlatListComp = ({ data, children, style, ...props }) => {
@@ -33,8 +33,8 @@ export const FlatListComp = ({ data, children, style, ...props }) => {
   )
 }
 
-const OrderList = (props) => {
-  const { items: data, mutateData } = useGetOrderData()
+const OrderList = ({ orderQuery, postType, ...props }) => {
+  const { data, mutateData } = useGetOrderData()
 
   useFocusEffect(
     React.useCallback(() => {
@@ -43,51 +43,42 @@ const OrderList = (props) => {
   )
 
   return (
-    <OrderRoot query={props.orderQuery}>
-      <ActionProvider value={props.gridPostAction}>
-        <FlatListComp data={data} postType={props.postType} {...props} />
-      </ActionProvider>
+    <OrderRoot query={orderQuery}>
+      <FlatListComp data={data} postType={postType} {...props} />
     </OrderRoot>
   )
 }
 
-export const GridPost = ({ postType, ...props }) => {
-  const gridPostAction = useGridPostAction()
-  const [data, setData] = useState()
+const ProductList = ({ productQuery, postType, ...props }) => {
+  const { data } = useGetProductData(productQuery)
 
-  const handleSetData = (data) => {
-    setData(data)
-  }
+  return (
+    <ProductRoot query={productQuery}>
+      <FlatListComp data={data} postType={postType} {...props} />
+    </ProductRoot>
+  )
+}
+
+const PostList = ({ postQuery, postType, ...props }) => {
+  const { data } = useGetPostData(postQuery, postType)
+
+  return (
+    <PostRoot query={postQuery}>
+      <FlatListComp data={data} postType={postType} {...props} />
+    </PostRoot>
+  )
+}
+
+export const GridPost = (props) => {
+  const postType = props?.postType
 
   if (postType === "product") {
-    return (
-      <ProductRoot query={props.productQuery} onSetData={handleSetData}>
-        <ActionProvider value={gridPostAction}>
-          <FlatListComp data={data} postType={postType} {...props} />
-        </ActionProvider>
-      </ProductRoot>
-    )
+    return <ProductList {...props} />
   }
 
   if (postType === "order") {
-    return (
-      <OrderList
-        gridPostAction={gridPostAction}
-        postType={postType}
-        {...props}
-      />
-    )
+    return <OrderList {...props} />
   }
 
-  return (
-    <PostRoot
-      query={props.postQuery}
-      postType={postType}
-      onSetData={handleSetData}
-    >
-      <ActionProvider value={gridPostAction}>
-        <FlatListComp data={data} postType={postType} {...props} />
-      </ActionProvider>
-    </PostRoot>
-  )
+  return <PostList {...props} />
 }

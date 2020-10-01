@@ -1,24 +1,18 @@
 import React from "react"
-import { atom, useRecoilState, useRecoilValue } from "recoil"
 import { PostTypeProvider } from "../PostTypeContext"
-import { ItemProvider } from "../PostContent"
-
-const wooSingleProduct = atom({
-  key: "wooSingleProduct",
-  default: []
-})
+import { useRoute } from "@react-navigation/native"
 
 function useSingleProduct() {
-  const [product, setProduct] = useRecoilState(wooSingleProduct)
-  const images = product?.images
-  return { product, setProduct, images }
+  const { params } = useRoute()
+  const product = params?.item
+  const images = params?.item.images
+  return { product, images }
 }
 
 function SingleProductRoot({ children }) {
-  const singleProduct = useRecoilValue(wooSingleProduct)
   return (
     <PostTypeProvider value={["product", "singleProduct"]}>
-      <ItemProvider value={singleProduct}>{children}</ItemProvider>
+      {children}
     </PostTypeProvider>
   )
 }

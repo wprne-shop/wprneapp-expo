@@ -2,10 +2,12 @@
 import React from "react"
 import {
   NavigationContainer,
-  getFocusedRouteNameFromRoute,
-  StackActions
+  getFocusedRouteNameFromRoute
 } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
+import {
+  createStackNavigator,
+  TransitionPresets
+} from "@react-navigation/stack"
 import { createSharedElementStackNavigator } from "react-navigation-shared-element"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { Icon } from "react-native-elements"
@@ -68,7 +70,7 @@ function BottomBar({ navigation, route }) {
 }
 
 const Stack = createStackNavigator()
-//const Stack = createSharedElementStackNavigator()
+// const Stack = createSharedElementStackNavigator()
 
 export default function Route() {
   const pages = useGetPages()
@@ -76,7 +78,11 @@ export default function Route() {
   if (!pages.length) return null
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          ...TransitionPresets.SlideFromRightIOS
+        }}
+      >
         {firstBottomNav && (
           <Stack.Screen name="BottomBar" component={BottomBar} />
         )}
@@ -89,14 +95,12 @@ export default function Route() {
                 title: page.name,
                 headerShown: page.showHeaderBar
               }}
-              // sharedElements={(route, otherRoute, showing) => {
-              //   const { item } = route.params
-              //   if (item?.id) {
+              // sharedElementsConfig={(route, otherRoute, showing) => {
+              //   if (route?.params?.item) {
+              //     const { item } = route.params
               //     return [
               //       {
-              //         id: `item.${item.id}.image`,
-              //         animation: "move",
-              //         resize: "clip"
+              //         id: `item.${item.id}.image`
               //       }
               //     ]
               //   }

@@ -1,5 +1,5 @@
 import React from "react"
-import useSWR, { mutate } from "swr"
+import useSWR from "swr"
 import { PostTypeProvider } from "../PostTypeContext"
 import { wooapi } from "../../Api"
 import { useAsyncStorage } from "@react-native-community/async-storage"
@@ -8,7 +8,7 @@ async function fetchData(json) {
   const param = JSON.parse(json)
   let { postType, ...query } = param
   const response = await wooapi.get(postType + "s", query)
-  return response
+  return response?.data
 }
 
 function useGetOrderData() {
@@ -69,10 +69,14 @@ function useGetOrderData() {
     return { ...order, line_items, line_item, image: line_items?.[0]?.image }
   })
 
-  return { items, isLoading: isValidating, mutateData: readItemFromStorage }
+  return {
+    data: items,
+    isLoading: isValidating,
+    mutateData: readItemFromStorage
+  }
 }
 
-function OrderRoot({ children, onLoading, onSetData }) {
+function OrderRoot({ children }) {
   return <PostTypeProvider value="order">{children}</PostTypeProvider>
 }
 

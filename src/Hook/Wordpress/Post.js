@@ -53,27 +53,14 @@ async function fetchPost(json) {
   return []
 }
 
-function PostRoot({
-  children,
-  query = {},
-  onLoading,
-  onSetData,
-  postType = "post"
-}) {
+function useGetPostData(query = {}, postType = "post") {
   const json = JSON.stringify({ postType, ...query })
   const { data, isValidating } = useSWR(json, fetchPost)
+  return { data, isLoading: isValidating }
+}
 
-  React.useEffect(() => {
-    if (typeof onLoading === "function") {
-      onLoading(isValidating)
-    }
-  }, [isValidating, onLoading])
-
-  React.useEffect(() => {
-    onSetData(data)
-  }, [data, onSetData])
-
+function PostRoot({ children, postType }) {
   return <PostTypeProvider value={postType}>{children}</PostTypeProvider>
 }
 
-export { PostRoot }
+export { PostRoot, useGetPostData }

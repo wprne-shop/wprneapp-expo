@@ -72,7 +72,7 @@ function useCart() {
 
   const priceField = cart.priceField
 
-  const cartItems = items?.map((item) => {
+  let cartItems = items?.map((item) => {
     return {
       ...item,
       subtotal: item.qty * item[priceField],
@@ -82,7 +82,19 @@ function useCart() {
     }
   })
 
-  return { cart, cartItems, addCart, addQty, reduceQty, resetCart }
+  const refocusCartItems = () => {
+    setCart(cart)
+  }
+
+  return {
+    cart,
+    cartItems,
+    addCart,
+    addQty,
+    reduceQty,
+    refocusCartItems,
+    resetCart
+  }
 }
 
 function useCartTotal() {

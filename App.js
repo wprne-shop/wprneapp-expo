@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { SplashScreen } from "expo"
 import { View } from "react-native"

@@ -1,6 +1,7 @@
 import React from "react"
 import { usePostTypeContent } from "../PostTypeContext"
 import { useCartTotal } from "../Cart"
+import { useRoute } from "@react-navigation/native"
 
 const ItemContext = React.createContext()
 
@@ -10,12 +11,13 @@ export function ItemProvider({ value, children }) {
 
 export function useItem() {
   const context = React.useContext(ItemContext)
+  const { params } = useRoute()
 
-  if (context === undefined) {
-    return {}
-  }
+  if (context) return context
 
-  return context
+  if (params?.item) return params.item
+
+  return {}
 }
 
 export function usePostContent(postContent) {
