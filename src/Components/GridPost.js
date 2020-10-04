@@ -63,7 +63,7 @@ const PostList = ({ postQuery, postType, ...props }) => {
   const { data } = useGetPostData(postQuery, postType)
 
   return (
-    <PostRoot query={postQuery}>
+    <PostRoot query={postQuery} postType={postType}>
       <FlatListComp data={data} postType={postType} {...props} />
     </PostRoot>
   )

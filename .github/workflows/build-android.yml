@@ -12,8 +12,8 @@ jobs:
       - uses: expo/expo-github-action@v5
         with:
           expo-version: 3.x
-          expo-username: ibnuyusuf87
-          expo-password: 132itb
+          expo-username: yourexpouser
+          expo-password: yourexpopassword
           expo-cache: true
       - run: yarn install
       - run: expo build:android
