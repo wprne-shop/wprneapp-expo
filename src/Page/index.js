@@ -6,16 +6,15 @@ import { useRoute } from "@react-navigation/native"
 import { useGetPages } from "../Hook"
 
 const buildChild = (parent, page) => {
-  let child =
-    typeof page[parent].nodes !== "undefined"
-      ? page[parent].nodes.map((node) => {
-          return buildComponent(node, page)
-        })
-      : typeof page[parent].linkedNodes !== "undefined"
-      ? Object.values(page[parent].linkedNodes).map((node) => {
-          return buildComponent(node, page)
-        })
-      : null
+  let child = page[parent]?.nodes?.length
+    ? page[parent].nodes.map((node) => {
+        return buildComponent(node, page)
+      })
+    : typeof page[parent].linkedNodes !== "undefined"
+    ? Object.values(page[parent].linkedNodes).map((node) => {
+        return buildComponent(node, page)
+      })
+    : null
 
   return child
 }

@@ -35,10 +35,6 @@ export function usePostImage() {
   const item = useItem()
 
   switch (type) {
-    case "post":
-    case "singlePost":
-      return item?._embedded?.["wp:featuredmedia"]?.[0]?.source_url
-
     case "product":
     case "singleProduct":
       return item?.images?.[0]?.src
@@ -48,6 +44,6 @@ export function usePostImage() {
       return item?.image
 
     default:
-      return ""
+      return item?._embedded?.["wp:featuredmedia"]?.[0]?.source_url
   }
 }
