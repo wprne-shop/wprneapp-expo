@@ -10,7 +10,7 @@ export const Image = ({ source, postContent, ...props }) => {
   const item = useItem()
 
   source = postContent !== "disable" ? postImage : source
-  source = source?.replace("localhost", "192.168.43.56")
+  // source = source?.replace("localhost", "192.168.43.56")
   const { style, ...restProps } = props
   const imgSrc = source ? { uri: source } : placeholder
   const { componentStyle, containerStyle } = getSeparatedStyle(style)

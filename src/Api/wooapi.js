@@ -5,8 +5,8 @@ import { config } from "../../config"
 const wooapiConfig = {
   url: config.baseUrl,
   isSsl: false,
-  consumerKey: config.ck,
-  consumerSecret: config.cs,
+  consumerKey: config.ck ?? "consumerKey",
+  consumerSecret: config.cs ?? "consumerSecret",
   version: "wc/v3",
   queryStringAuth: true
 }

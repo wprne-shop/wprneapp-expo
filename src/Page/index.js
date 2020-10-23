@@ -10,7 +10,8 @@ const buildChild = (parent, page) => {
     ? page[parent].nodes.map((node) => {
         return buildComponent(node, page)
       })
-    : typeof page[parent].linkedNodes !== "undefined"
+    : typeof page[parent].linkedNodes === "object" &&
+      Object.values(page[parent].linkedNodes)?.length
     ? Object.values(page[parent].linkedNodes).map((node) => {
         return buildComponent(node, page)
       })
@@ -36,38 +37,48 @@ const buildComponent = (parent, page) => {
   )
 }
 
-const Page = () => {
+const Page = ({ navigation, route }) => {
   const pages = useGetPages()
   const { name } = useRoute()
   const index = name.split("-")[1]
   const json = pages?.[index]?.json
   const data = json && JSON.parse(json)
 
-  if (pages?.[index]?.showHeaderBar) {
-    return (
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        // refreshControl={
-        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        // }
-      >
-        {buildComponent("ROOT", data) || null}
-      </ScrollView>
-    )
-  }
+  React.useLayoutEffect(() => {
+    const params = route.params
+    const title = params?.item?.title?.rendered ?? params?.item?.name
+    if (title) {
+      navigation.setOptions({ title })
+    }
+  }, [navigation, route])
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        // refreshControl={
-        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        // }
-      >
-        {buildComponent("ROOT", data) || null}
-      </ScrollView>
-    </SafeAreaView>
-  )
+  return buildComponent("ROOT", data) || null
+
+  // if (pages?.[index]?.showHeaderBar) {
+  //   return (
+  //     <ScrollView
+  //       contentContainerStyle={{ flexGrow: 1 }}
+  //       // refreshControl={
+  //       //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  //       // }
+  //     >
+  //       {buildComponent("ROOT", data) || null}
+  //     </ScrollView>
+  //   )
+  // }
+
+  // return (
+  //   <SafeAreaView style={{ flex: 1 }}>
+  //     <ScrollView
+  //       contentContainerStyle={{ flexGrow: 1 }}
+  //       // refreshControl={
+  //       //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  //       // }
+  //     >
+  //       {buildComponent("ROOT", data) || null}
+  //     </ScrollView>
+  //   </SafeAreaView>
+  // )
 }
 
 export default Page

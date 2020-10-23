@@ -22,7 +22,7 @@ export const FlatListComp = ({ data, children, style, ...props }) => {
       <View style={style}>
         <FlatList
           data={data}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item?.id?.toString()}
           {...flatListProps}
           renderItem={({ item }) => (
             <ItemProvider value={item}>{children}</ItemProvider>
@@ -69,16 +69,26 @@ const PostList = ({ postQuery, postType, ...props }) => {
   )
 }
 
-export const GridPost = (props) => {
+export const GridPost = ({ style, ...props }) => {
   const postType = props?.postType
 
-  if (postType === "product") {
-    return <ProductList {...props} />
+  let List = PostList
+  switch (postType) {
+    case "product":
+      List = ProductList
+      break
+    case "order":
+      List = OrderList
+      break
+
+    default:
+      List = PostList
+      break
   }
 
-  if (postType === "order") {
-    return <OrderList {...props} />
-  }
-
-  return <PostList {...props} />
+  return (
+    <View style={style}>
+      <List {...props} />
+    </View>
+  )
 }

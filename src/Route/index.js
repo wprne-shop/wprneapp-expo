@@ -17,8 +17,12 @@ import Page from "../Page"
 function getOptions(route, pages) {
   const routeName = getFocusedRouteNameFromRoute(route) ?? "page-0"
   const index = routeName.split("-")[1]
+  const params = route.params
 
-  const title = pages?.[index].name || ""
+  const title =
+    params?.item?.title?.rendered ??
+    params?.item?.name ??
+    (pages?.[index]?.name || "")
   const headerShown = pages?.[index].showHeaderBar
 
   return { title, headerShown }
@@ -101,6 +105,10 @@ export default function Route() {
               //     return [
               //       {
               //         id: `item.${item.id}.image`
+              //       },
+              //       {
+              //         id: `item.${item.id}.container`,
+              //         resize: "none"
               //       }
               //     ]
               //   }

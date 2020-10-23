@@ -2,7 +2,6 @@ import React from "react"
 import useSWR from "swr"
 import { PostTypeProvider } from "../PostTypeContext"
 import { wpapi } from "../../Api"
-import { config } from "../../../config"
 
 async function fetchPost(json) {
   const param = JSON.parse(json)
@@ -33,30 +32,13 @@ async function fetchPost(json) {
   fetcher = fetcher.embed()
 
   const response = await fetcher
-  if (Array.isArray(response) && response.length) {
-    const ids = response.map((item) => item?.id)
-
-    const result = await fetch(
-      config.baseUrl + "wp-json/wprne/v1/acf/get_fields",
-      {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids })
-      }
-    )
-    const data = result.json()
-    return response.map((post) => ({
-      ...post,
-      ...data?.fields?.[post.id]
-    }))
-  }
-  return []
+  return response
 }
 
 function useGetPostData(query = {}, postType = "post") {
   const json = JSON.stringify({ postType, ...query })
-  const { data, isValidating } = useSWR(json, fetchPost)
-  return { data, isLoading: isValidating }
+  const { data } = useSWR(json, fetchPost)
+  return { data, isLoading: !data }
 }
 
 function PostRoot({ children, postType }) {

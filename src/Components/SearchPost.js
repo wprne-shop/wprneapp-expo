@@ -51,7 +51,7 @@ export const SearchPostComp = ({ searchQuery, ...props }) => {
   )
 }
 
-export const SearchPost = (props) => {
+export const SearchPost = ({ style, ...props }) => {
   const [search, setSearch] = React.useState("")
   const [searchQuery, setSearchQuery] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(false)
@@ -77,6 +77,7 @@ export const SearchPost = (props) => {
         value={search}
         lightTheme
         showLoading={isLoading}
+        containerStyle={style}
       />
       <SearchPostComp
         searchQuery={searchQuery}
