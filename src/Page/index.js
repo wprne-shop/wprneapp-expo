@@ -1,9 +1,5 @@
 import React from "react"
 import * as components from "../Components"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { ScrollView, RefreshControl } from "react-native"
-import { useRoute } from "@react-navigation/native"
-import { useGetPages } from "../Hook"
 
 const buildChild = (parent, page) => {
   let child = page[parent]?.nodes?.length
@@ -37,12 +33,9 @@ const buildComponent = (parent, page) => {
   )
 }
 
-const Page = ({ navigation, route }) => {
-  const pages = useGetPages()
-  const { name } = useRoute()
-  const index = name.split("-")[1]
-  const json = pages?.[index]?.json
-  const data = json && JSON.parse(json)
+const Page = ({ navigation, route, page }) => {
+  const json = page?.json
+  const dataJson = json && JSON.parse(json)
 
   React.useLayoutEffect(() => {
     const params = route.params
@@ -52,7 +45,7 @@ const Page = ({ navigation, route }) => {
     }
   }, [navigation, route])
 
-  return buildComponent("ROOT", data) || null
+  return buildComponent("ROOT", dataJson) || null
 
   // if (pages?.[index]?.showHeaderBar) {
   //   return (

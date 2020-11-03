@@ -1,5 +1,5 @@
 import React from "react"
-import { Text as TextUi } from "react-native"
+import { Platform, Text as TextUi } from "react-native"
 import HTML from "react-native-render-html"
 import { usePostContent } from "../Hook"
 import AutoHeightWebView from "react-native-autoheight-webview"
@@ -36,7 +36,13 @@ export const Text = ({ title, postContent, ...props }) => {
   const { style, ...restProps } = props
 
   return props.isHtml ? (
-    props.isWebView ? (
+    Platform.OS === "web" ? (
+      <div
+        dangerouslySetInnerHTML={{
+          __html: props.isWebView ? generateHtml(title) : title
+        }}
+      />
+    ) : props.isWebView ? (
       <AutoHeightWebView
         style={{
           ...style,

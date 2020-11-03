@@ -1,6 +1,5 @@
 import React from "react"
 import { View, Image } from "react-native"
-import { SharedElement } from "react-navigation-shared-element"
 import { SingleProductRoot, useSingleProduct } from "../Hook"
 import { Carousel } from "./Carousel"
 import { useRoute } from "@react-navigation/native"
@@ -8,7 +7,7 @@ import { useRoute } from "@react-navigation/native"
 export const WooImageCarousel = (props) => {
   const { images } = useSingleProduct()
   const { params } = useRoute()
-  const { carouselWidth, carouselHeight, style, children, ...restProps } = props
+  const { carouselWidth, carouselHeight, style, ...restProps } = props
 
   const item = params?.item
 
@@ -20,11 +19,7 @@ export const WooImageCarousel = (props) => {
       {!!images?.length &&
         images.map(({ src }, index) => {
           if (index === 0 && item) {
-            return (
-              <SharedElement key={index} id={`item.${item.id}.image`}>
-                <Image source={{ uri: src }} style={style} />
-              </SharedElement>
-            )
+            return <Image source={{ uri: src }} style={style} />
           }
           return <Image key={index} source={{ uri: src }} style={style} />
         })}

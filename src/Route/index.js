@@ -8,10 +8,9 @@ import {
   createStackNavigator,
   TransitionPresets
 } from "@react-navigation/stack"
-import { createSharedElementStackNavigator } from "react-navigation-shared-element"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { Icon } from "react-native-elements"
-import { useGetPages } from "../Hook"
+import useSWR from "swr"
 import Page from "../Page"
 
 function getOptions(route, pages) {
@@ -30,8 +29,7 @@ function getOptions(route, pages) {
 
 const Tab = createBottomTabNavigator()
 
-function BottomBar({ navigation, route }) {
-  const pages = useGetPages()
+function BottomBar({ navigation, route, pages }) {
   React.useLayoutEffect(() => {
     const options = getOptions(route, pages)
     navigation.setOptions({ ...options })
@@ -74,12 +72,14 @@ function BottomBar({ navigation, route }) {
 }
 
 const Stack = createStackNavigator()
-// const Stack = createSharedElementStackNavigator()
 
 export default function Route() {
-  const pages = useGetPages()
+  const { data } = useSWR("page/get_pages")
+  const pages = data?.pages
   const firstBottomNav = pages?.find((page) => page?.addToBottomNav)
-  if (!pages.length) return null
+
+  if (!data) return null
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -88,7 +88,9 @@ export default function Route() {
         }}
       >
         {firstBottomNav && (
-          <Stack.Screen name="BottomBar" component={BottomBar} />
+          <Stack.Screen name="BottomBar">
+            {(props) => <BottomBar {...props} pages={pages} />}
+          </Stack.Screen>
         )}
         {Array.isArray(pages) &&
           pages.map((page, id) => (
@@ -99,23 +101,9 @@ export default function Route() {
                 title: page.name,
                 headerShown: page.showHeaderBar
               }}
-              // sharedElementsConfig={(route, otherRoute, showing) => {
-              //   if (route?.params?.item) {
-              //     const { item } = route.params
-              //     return [
-              //       {
-              //         id: `item.${item.id}.image`
-              //       },
-              //       {
-              //         id: `item.${item.id}.container`,
-              //         resize: "none"
-              //       }
-              //     ]
-              //   }
-              //   return undefined
-              // }}
-              component={Page}
-            />
+            >
+              {(props) => <Page {...props} page={page} />}
+            </Stack.Screen>
           ))}
       </Stack.Navigator>
     </NavigationContainer>

@@ -4,38 +4,23 @@ import { SplashScreen } from "expo"
 import { View } from "react-native"
 import { config } from "./config"
 import Route from "./src/Route"
-import { useSetPages, useIsLoadingPages } from "./src/Hook"
 import { RecoilRoot } from "recoil"
-import { SWRConfig } from "swr"
+import useSWR, { SWRConfig } from "swr"
+
+const fetcher = (key) =>
+  fetch(config.baseUrl + "wp-json/wprne/v1/" + key).then((r) => r.json())
 
 function Init() {
-  const [isLoading, setIsLoading] = useIsLoadingPages()
-  const setPages = useSetPages()
+  const { data } = useSWR("page/get_pages")
+  const isLoading = !!data
 
   useEffect(() => {
     SplashScreen.preventAutoHide()
 
-    if (isLoading) {
-      fetch(config.baseUrl + "wp-admin/admin-ajax.php", {
-        method: "POST",
-        cache: "no-cache",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "action=wprne_get_page"
-      })
-        .then((res) => {
-          return res.json()
-        })
-        .then((data) => {
-          if (data?.pages) {
-            setPages(data?.pages)
-            setIsLoading(false)
-          }
-          SplashScreen.hide()
-        })
+    if (!isLoading) {
+      SplashScreen.hide()
     }
-  }, [isLoading, setPages, setIsLoading])
+  }, [isLoading])
 
   return null
 }
@@ -48,7 +33,8 @@ export default function App() {
           value={{
             revalidateOnFocus: false,
             refreshInterval: 0,
-            errorRetryCount: 3
+            errorRetryCount: 3,
+            fetcher
           }}
         >
           <Init />
