@@ -1,27 +1,33 @@
 {
-  "expo": {
-    "name": "wp react native editor app",
-    "slug": "wprne-app",
-    "platforms": ["ios", "android", "web"],
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": ["**/*"],
-    "ios": {
-      "bundleIdentifier": "com.syarifstudio.wprne",
-      "buildNumber": "1.0.0"
-    },
-    "android": {
-      "package": "com.syarifstudio.wprne",
-      "versionCode": 1
-    }
-  }
+	"expo": {
+		"name": "Woo Store",
+		"slug": "woo-store",
+		"platforms": [
+			"ios",
+			"android",
+			"web"
+		],
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		},
+		"updates": {
+			"fallbackToCacheTimeout": 0
+		},
+		"assetBundlePatterns": [
+			"**/*"
+		],
+		"ios": {
+			"bundleIdentifier": "com.syarifstudio.wprne",
+			"buildNumber": "1.0.0"
+		},
+		"android": {
+			"package": "com.wprne.woostore",
+			"versionCode": 1
+		}
+	}
 }
